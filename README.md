@@ -1,267 +1,71 @@
-# Challenge - Monitoramento e Priorização de Vegetação em Rodovias
+# Sprint 3 — Sistema MOTIVA (persistência com Oracle + JDBC puro)
 
-## Objetivo do Projeto
+Este projeto evolui o sistema MOTIVA (Sprints 1 e 2) adicionando persistência
+de dados em Oracle via JDBC puro, além de corrigir os pontos arquiteturais
+apontados no feedback da Sprint 2.
 
-O objetivo deste projeto é desenvolver um sistema em Java capaz de simular o monitoramento de vegetação em trechos de rodovias, permitindo registrar o crescimento da vegetação e identificar trechos críticos para manutenção.
+## O que mudou em relação à Sprint 2
 
-Além disso, o sistema associa equipes de manutenção aos trechos críticos e gera um relatório automático de priorização de intervenções.
+- **Correção arquitetural (IoT):** `MonitoravelViaIoT` não é mais implementada
+  pela classe base `TrechoRodovia`. Foi criada a subclasse
+  `TrechoMonitoradoIoT`, que é a única com capacidade de transmitir dados via
+  sensor.
+- **3 níveis de intervenção:** `SemIntervencao`, `Pulverizacao` e
+  `RocadaMecanizada` (esta com variante "urgente").
+- **Magic numbers extraídos:** todos os limiares e taxas de crescimento estão
+  em `model/Constantes.java`.
+- **Lógica de decisão separada:** a decisão de qual intervenção aplicar saiu
+  de `TrechoRodovia` e foi para `service/IntervencaoService.java`.
+- **Persistência (novo, Sprint 3):** pacotes `db/`, `dao/` e `service/` com
+  `ConexaoBD`, quatro DAOs (padrão inserir/buscarPorId/listarTodas/atualizar/
+  deletar) e `GeradorRelatorio`, que agora salva o histórico de relatórios no
+  banco.
 
----
-
-# Funcionalidades
-
-- Cadastro de trechos de rodovia
-- Registro de crescimento da vegetação
-- Identificação de trechos críticos
-- Associação de equipes de manutenção
-- Geração de relatório automático de prioridade
-- Validação de dados
-- Encapsulamento com getters e setters
-- Testes manuais de funcionamento
-
----
-
-# Tecnologias Utilizadas
-
-- Java 17
-- Visual Studio Code
-- GitHub
-
----
-
-# Conceitos de POO
-
-## Classes e Objetos
-
-A classe `TrechoRodovia` representa um trecho monitorado da rodovia. A partir dela, são criados objetos como:
-
-- BR-116 KM 10 ao 15
-- BR-101 KM 20 ao 25
-
----
-
-## Métodos e Comportamentos
-
-Foi implementado o método:
-
-```java
-registrarCrescimento(double taxa)
-```
-
-Responsável por atualizar o nível da vegetação conforme a taxa informada.
-
----
-
-## Encapsulamento
-
-O atributo `nivelVegetacao` é privado, garantindo controle sobre seus valores. Também há validação para impedir valores negativos.
-
----
-
-## Interface (Monitoramento IoT)
-
-Foi criada a interface:
-
-```java
-MonitoravelViaIoT
-```
-
-Com o método:
-
-```java
-transmitirDadosSensor();
-```
-
-A classe `TrechoRodovia` implementa essa interface, permitindo simular atualização automática via sensores.
-
----
-
-## Classe Abstrata
-
-Foi criada a classe abstrata:
-
-```java
-IntervencaoOperacional
-```
-
-Ela representa uma intervenção genérica em um trecho de rodovia e define o método abstrato:
-
-```java
-executarServico();
-```
-
----
-
-## Herança
-
-As classes abaixo herdam de `IntervencaoOperacional`:
-
-- RocadaMecanizada
-- Pulverizacao
-
----
-
-## Polimorfismo
-
-O sistema utiliza polimorfismo ao definir dinamicamente a intervenção adequada para cada trecho:
-
-```java
-IntervencaoOperacional intervencao =
-        trecho.definirIntervencao();
-```
-
----
-
-# Estrutura do Projeto
+## Estrutura de pacotes
 
 ```
-├── Main.java
-├── TrechoRodovia.java
-├── EquipeManutencao.java
-├── MonitoravelViaIoT.java
-├── IntervencaoOperacional.java
-├── RocadaMecanizada.java
-├── Pulverizacao.java
-└── SensorMock.java
+src/
+├── model/     # TrechoRodovia, TrechoMonitoradoIoT, EquipeManutencao,
+│              # IntervencaoOperacional e subclasses, Constantes
+├── db/        # ConexaoBD (Singleton)
+├── dao/       # EquipeManutencaoDAO, TrechoRodoviaDAO,
+│              # IntervencaoOperacionalDAO, RelatorioPrioridadeDAO
+├── service/   # IntervencaoService, GeradorRelatorio
+└── main/      # Main (classe de demonstração)
+sql/
+├── script-criacao.sql
+└── script-dados.sql
 ```
 
----
+## Como rodar
 
-# Sprint 1
+1. **Configurar credenciais:** edite `src/db/ConexaoBD.java` e ajuste `URL`,
+   `USUARIO` e `SENHA` para o Oracle do laboratório (host, porta e serviço).
+2. **Criar o banco:** execute `sql/script-criacao.sql` e depois
+   `sql/script-dados.sql` no Oracle (SQL*Plus, SQL Developer, etc.).
+3. **Driver JDBC:** coloque `ojdbc17.jar` em `lib/` (não incluso neste pacote —
+   baixe da Oracle ou copie do laboratório).
+4. **Compilar:**
+   ```
+   javac -cp lib/ojdbc17.jar -d out $(find src -name "*.java")
+   ```
+5. **Executar:**
+   ```
+   java -cp out:lib/ojdbc17.jar main.Main      # Linux/Mac
+   java -cp out;lib/ojdbc17.jar main.Main       # Windows
+   ```
 
-## Objetivo
+## Observações
 
-Implementar a estrutura inicial do sistema utilizando conceitos básicos de POO.
-
-## Funcionalidades
-
-- Cadastro de trechos
-- Registro de crescimento da vegetação
-- Identificação de trechos críticos
-- Associação de equipes de manutenção
-- Encapsulamento
-- Validação de dados
-
----
-
-# Sprint 2 – Motor de Regras
-
-## Objetivo
-
-Adicionar inteligência ao sistema com:
-
-- Classes abstratas
-- Interfaces
-- Herança
-- Polimorfismo
-
----
-
-## Crescimento Diferenciado
-
-- Terreno SECO: +5 cm
-- Terreno ÚMIDO: +10 cm
-
----
-
-## Relatório Automático
-
-O sistema percorre um array de trechos e gera um relatório com:
-
-- Rodovia
-- KM inicial
-- KM final
-- Vegetação
-- Tipo de intervenção
-
----
-
-# Testes Realizados
-
-- Crescimento da vegetação
-- Validação de valores negativos
-- Identificação de trechos críticos
-- Execução de sensores IoT
-- Teste de interface (Mock)
-- Teste de classe abstrata (conceitual)
-- Geração de relatório automático
-
----
-
-# Exemplo de Saída
-
-```
-===== TRECHO =====
-Rodovia: BR-116
-Vegetação: 17.0 cm
-Status: Normal
-
-===== TRECHO =====
-Rodovia: BR-101
-Vegetação: 38.0 cm
-Status: CRÍTICO
-
-===== EQUIPE ASSOCIADA =====
-Equipe: Equipe Sul
-Responsável: Carlos Silva
-
-===== RELATÓRIO DE PRIORIDADE =====
-Rodovia: BR-116
-Intervenção: Pulverização
-
-Rodovia: BR-101
-Intervenção: Roçada Mecanizada
-
-===== TESTE MOCK =====
-Mock enviando dados do sensor.
-```
-
----
-
-# Reflexões
-
-## Por que não faz sentido executar apenas uma Intervenção Operacional genérica?
-
-Porque `IntervencaoOperacional` é uma abstração. Na prática, é necessário executar ações específicas como Roçada Mecanizada ou Pulverização.
-
----
-
-## Diferença entre classe abstrata e interface
-
-- Classe abstrata: permite compartilhar estrutura e comportamento.
-- Interface: define apenas um contrato de comportamento, sem implementação obrigatória.
-
----
-
-# Como Executar
-
-```bash
-javac *.java
-java Main
-```
-
----
-
-# Resultado Esperado
-
-O sistema deve:
-
-- Simular crescimento da vegetação
-- Identificar trechos críticos
-- Associar equipes
-- Gerar relatório automático
-- Executar testes de interface e abstração
-```
-
----
-
-Se você usar esse README, seu projeto fica:
-
-✔ organizado  
-✔ sem repetição  
-✔ alinhado com o enunciado  
-✔ com evolução clara entre sprints  
-✔ pronto para entrega  
-
-Se quiser, posso agora fazer uma última revisão “nível professor chato” no seu GitHub antes de você enviar. 🚀
-# sprint2_POO
+- As tabelas usam `GENERATED ALWAYS AS IDENTITY` (Oracle 12c+) — os DAOs leem
+  o ID gerado via `getGeneratedKeys()`.
+- Os DAOs usam `try-with-resources` para `PreparedStatement`/`ResultSet`
+  (fecha os recursos automaticamente, mesmo em caso de exceção) e todas as
+  queries usam `PreparedStatement` com parâmetros (`?`), nunca concatenação de
+  string.
+- Se a conexão com o Oracle falhar, `GeradorRelatorio` continua imprimindo o
+  relatório no console normalmente e apenas avisa no `stderr` que não
+  conseguiu salvar no banco — a aplicação não quebra.
+- Não foi possível compilar o projeto neste ambiente (sem acesso ao Oracle
+  nem a um JDK completo), então revise a compilação no seu ambiente antes da
+  entrega.
