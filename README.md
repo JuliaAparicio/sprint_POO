@@ -69,3 +69,130 @@ sql/
 - Não foi possível compilar o projeto neste ambiente (sem acesso ao Oracle
   nem a um JDK completo), então revise a compilação no seu ambiente antes da
   entrega.
+=======
+---
+
+# Sprint 1
+
+## Objetivo
+
+Implementar a estrutura inicial do sistema utilizando conceitos básicos de POO.
+
+## Funcionalidades
+
+- Cadastro de trechos
+- Registro de crescimento da vegetação
+- Identificação de trechos críticos
+- Associação de equipes de manutenção
+- Encapsulamento
+- Validação de dados
+
+---
+
+# Sprint 2 – Motor de Regras
+
+## Objetivo
+
+Adicionar inteligência ao sistema com:
+
+- Classes abstratas
+- Interfaces
+- Herança
+- Polimorfismo
+
+---
+
+## Crescimento Diferenciado
+
+- Terreno SECO: +5 cm
+- Terreno ÚMIDO: +10 cm
+
+---
+
+## Relatório Automático
+
+O sistema percorre um array de trechos e gera um relatório com:
+
+- Rodovia
+- KM inicial
+- KM final
+- Vegetação
+- Tipo de intervenção
+
+---
+
+# Testes Realizados
+
+- Crescimento da vegetação
+- Validação de valores negativos
+- Identificação de trechos críticos
+- Execução de sensores IoT
+- Teste de interface (Mock)
+- Teste de classe abstrata (conceitual)
+- Geração de relatório automático
+
+---
+
+# Exemplo de Saída
+
+```
+===== TRECHO =====
+Rodovia: BR-116
+Vegetação: 17.0 cm
+Status: Normal
+
+===== TRECHO =====
+Rodovia: BR-101
+Vegetação: 38.0 cm
+Status: CRÍTICO
+
+===== EQUIPE ASSOCIADA =====
+Equipe: Equipe Sul
+Responsável: Carlos Silva
+
+===== RELATÓRIO DE PRIORIDADE =====
+Rodovia: BR-116
+Intervenção: Pulverização
+
+Rodovia: BR-101
+Intervenção: Roçada Mecanizada
+
+===== TESTE MOCK =====
+Mock enviando dados do sensor.
+```
+
+---
+
+# Reflexões
+
+## Por que não faz sentido executar apenas uma Intervenção Operacional genérica?
+
+Porque `IntervencaoOperacional` é uma abstração. Na prática, é necessário executar ações específicas como Roçada Mecanizada ou Pulverização.
+
+---
+
+## Diferença entre classe abstrata e interface
+
+- Classe abstrata: permite compartilhar estrutura e comportamento.
+- Interface: define apenas um contrato de comportamento, sem implementação obrigatória.
+
+---
+
+# Como Executar
+
+```bash
+javac *.java
+java Main
+```
+
+---
+
+# Resultado Esperado
+
+O sistema deve:
+
+- Simular crescimento da vegetação
+- Identificar trechos críticos
+- Associar equipes
+- Gerar relatório automático
+- Executar testes de interface e abstração
