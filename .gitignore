@@ -1,2 +1,19 @@
+# Build
+target/
+out/
 *.class
+
+# IDEs
+.idea/
+*.iml
 .vscode/
+.settings/
+.project
+.classpath
+
+# Credenciais locais (NUNCA versionar)
+.env
+application-local.properties
+
+# SO
+.DS_Store
