@@ -31,7 +31,7 @@ A herança da Sprint 2 foi preservada no JPA com `@Inheritance(SINGLE_TABLE)`:
 
 | Pendência | Como foi resolvida |
 |---|---|
-| Senha real do Oracle fixa em `ConexaoBD.java` | `ConexaoBD` foi removida. Credenciais vêm de `ORACLE_USER` / `ORACLE_PASSWORD` (variáveis de ambiente). `.gitignore` bloqueia `.env` e `application-local.properties`.|
+| Senha real do Oracle fixa em `ConexaoBD.java` | `ConexaoBD` foi removida. Credenciais vêm de `ORACLE_USER` / `ORACLE_PASSWORD` (variáveis de ambiente). `.gitignore` bloqueia `.env` e `application-local.properties`. A senha do Oracle foi trocada. |
 | `SQLException` sem tratamento / sem mensagem orientativa | `GlobalExceptionHandler` (`@RestControllerAdvice`): todo erro vira um JSON padronizado com o status HTTP certo (400, 404, 409, 503...) e uma mensagem dizendo o que fazer. Falha de banco (o antigo `SQLException`) vira **503** com mensagem amigável. |
 | `EQUIPE_MANUTENCAO` isolada | Nova FK `INTERVENCAO_OPERACIONAL.ID_EQUIPE → EQUIPE_MANUTENCAO.ID` (`@ManyToOne`). Consultas de alocação: `GET /api/equipes/{id}/intervencoes` e `GET /api/trechos/{id}/intervencoes`. Scripts SQL ajustados. |
 
